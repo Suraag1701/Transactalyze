@@ -20,6 +20,7 @@ main = Blueprint("main", __name__)
 @limiter.limit("5 per minute")  # ✅ Limit only this route
 def index():
     result_file = None
+    category_totals = None  # ⬅️ Initialize to default for GET
 
     if request.method == "POST":
         if request.form.get("website"):
@@ -82,12 +83,45 @@ def index():
             current_app.config['HASHED_RESULTS'][hash_key] = categories
             df["AutoCategory_v1"] = categories
 
+        # ⬅️ Compute category totals
+        category_totals = df.groupby(
+            "AutoCategory_v1")["Amount"].sum().abs().round(2).reset_index()
+        category_totals.columns = ["Category", "Total"]
+        session["category_totals"] = category_totals.to_dict(orient="records")
+
         file_format = request.form.get("format", "csv")
 
         if file_format == "xlsx":
             output = io.BytesIO()
             with pd.ExcelWriter(output, engine='xlsxwriter') as writer:
+                # Write the main transaction DataFrame
                 df.to_excel(writer, index=False, sheet_name='Transactions')
+
+                # Access workbook and worksheet
+                workbook = writer.book
+                worksheet = writer.sheets['Transactions']
+
+                # Prepare category totals
+                category_totals_df = df.groupby("AutoCategory_v1")[
+                    "Amount"].sum().abs().round(2).reset_index()
+                category_totals_df.columns = ["Category", "Total"]
+
+                # Determine where to place totals
+                num_columns = len(df.columns)
+                start_col = num_columns + 5  # 5 columns after the end of main table
+                start_row = 2  # Start at row 3 (0-indexed)
+
+                # Write headers
+                worksheet.write(start_row, start_col, "Category")
+                worksheet.write(start_row, start_col + 1, "Total")
+
+                # Write category totals
+                for i, row in category_totals_df.iterrows():
+                    worksheet.write(start_row + 1 + i, start_col,
+                                    row["Category"])
+                    worksheet.write(start_row + 1 + i, start_col + 1,
+                                    row["Total"])
+
             output.seek(0)
             mime_type = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
             filename_out = sanitize_filename(
@@ -95,7 +129,17 @@ def index():
         else:
             output = io.StringIO()
             df.to_csv(output, index=False, quoting=1)
+
+            # Append a separator and the category totals
+            output.write("\n\nCategory Totals\n")
+
+            category_totals_df = df.groupby("AutoCategory_v1")["Amount"].sum(
+            ).abs().round(2).reset_index()
+            category_totals_df.columns = ["Category", "Total"]
+            category_totals_df.to_csv(output, index=False)
+
             output.seek(0)
+
             mime_type = "text/csv"
             filename_out = sanitize_filename(
                 file.filename) + "_Categorized.csv"
@@ -118,13 +162,18 @@ def index():
 
         return redirect(url_for("main.index", result=file_id) + "#get-started")
 
+    # ⬅️ Handle result after redirect
     result_file_id = request.args.get("result")
     if result_file_id:
         file_info = current_app.config['PROCESSED_FILES'].get(result_file_id)
         if file_info:
             result_file = {"id": result_file_id, "name": file_info["filename"]}
+            category_totals = session.get(
+                "category_totals")  # ⬅️ Load totals if available
 
-    return render_template("index.html", result_file=result_file)
+    return render_template("index.html",
+                           result_file=result_file,
+                           category_totals=category_totals)
 
 
 @main.route("/history/<file_id>")
