@@ -1,0 +1,8 @@
+
+openai
+flask
+pandas
+pdf2image
+pdfplumber
+pytesseract
+Flask-Limiter

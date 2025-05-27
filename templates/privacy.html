@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Privacy Policy — Transactalyze</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Poppins', sans-serif; }
+  </style>
+</head>
+<body class="bg-gray-50 text-gray-800">
+  <div class="max-w-3xl mx-auto px-4 py-10">
+    <h1 class="text-3xl font-bold text-blue-700 mb-8 text-center">Privacy Policy</h1>
+
+    <div class="space-y-4">
+      <div class="border rounded-lg overflow-hidden">
+        <button onclick="toggleAnswer('q1')" class="w-full text-left px-4 py-3 bg-blue-100 hover:bg-blue-200 font-semibold text-blue-800">
+          🔒 What information does Transactalyze collect?
+        </button>
+        <div id="q1" class="hidden px-4 py-3 bg-white text-gray-700">
+          Transactalyze only processes the transaction descriptions in the uploaded files for categorization. We do not collect, store, or associate any personally identifiable information (PII).
+        </div>
+      </div>
+
+      <div class="border rounded-lg overflow-hidden">
+        <button onclick="toggleAnswer('q2')" class="w-full text-left px-4 py-3 bg-blue-100 hover:bg-blue-200 font-semibold text-blue-800">
+          🔐 Is my data stored or shared?
+        </button>
+        <div id="q2" class="hidden px-4 py-3 bg-white text-gray-700">
+          No. Your uploaded files are processed in memory and are not stored on our servers. Nothing is shared with any third-party except for anonymized descriptions temporarily used for AI categorization.
+        </div>
+      </div>
+
+      <div class="border rounded-lg overflow-hidden">
+        <button onclick="toggleAnswer('q3')" class="w-full text-left px-4 py-3 bg-blue-100 hover:bg-blue-200 font-semibold text-blue-800">
+          📂 What happens to my uploaded files?
+        </button>
+        <div id="q3" class="hidden px-4 py-3 bg-white text-gray-700">
+          Your files are held temporarily in memory during your session and are discarded as soon as processing is complete or your session ends. Nothing is retained or tracked.
+        </div>
+      </div>
+
+      <div class="border rounded-lg overflow-hidden">
+        <button onclick="toggleAnswer('q4')" class="w-full text-left px-4 py-3 bg-blue-100 hover:bg-blue-200 font-semibold text-blue-800">
+          📧 Do I need to create an account or provide an email?
+        </button>
+        <div id="q4" class="hidden px-4 py-3 bg-white text-gray-700">
+          During the beta phase, no account is required to use Transactalyze. However, once the product launches, users will need to create a free account to categorize more than one document. This helps us manage usage and provide session history securely.
+        </div>
+      </div>
+
+      <div class="border rounded-lg overflow-hidden">
+        <button onclick="toggleAnswer('q5')" class="w-full text-left px-4 py-3 bg-blue-100 hover:bg-blue-200 font-semibold text-blue-800">
+          📞 How can I contact the team?
+        </button>
+        <div id="q5" class="hidden px-4 py-3 bg-white text-gray-700">
+          You can reach us any time at <a href="mailto:hello@Transactalyze.com" class="text-blue-600 hover:underline">hello@Transactalyze.com</a>. We're happy to answer questions or take feedback.
+        </div>
+      </div>
+    </div>
+
+    <div class="text-center text-sm text-gray-500 mt-10">
+      &copy; 2025 Transactalyze — Privacy-first by design.
+    </div>
+  </div>
+
+  <script>
+    function toggleAnswer(id) {
+      const answer = document.getElementById(id);
+      answer.classList.toggle('hidden');
+    }
+  </script>
+</body>
+</html>

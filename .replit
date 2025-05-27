@@ -3,6 +3,7 @@ modules = ["python-3.11"]
 
 [nix]
 channel = "stable-24_05"
+packages = ["freetype", "glibcLocales", "gumbo", "harfbuzz", "jbig2dec", "libjpeg_turbo", "mupdf", "openjpeg", "poppler_utils", "swig", "tesseract", "xcbuild"]
 
 [unitTest]
 language = "python3"
@@ -13,3 +14,11 @@ requiredFiles = [".replit", "replit.nix"]
 [deployment]
 run = ["python3", "main.py"]
 deploymentTarget = "cloudrun"
+
+[[ports]]
+localPort = 81
+externalPort = 80
+
+[[ports]]
+localPort = 3000
+externalPort = 3000
