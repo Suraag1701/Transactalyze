@@ -1,7 +1,7 @@
-# Use Python base image
+# Use official slim Python image
 FROM python:3.11-slim
 
-# Install system dependencies
+# Install system dependencies including tesseract
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
     poppler-utils \
@@ -12,23 +12,27 @@ RUN apt-get update && apt-get install -y \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/*
 
+# Optional: Confirm tesseract is installed (debug)
+RUN which tesseract
+
+# Set environment variables
+ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/
+ENV PATH="/usr/bin:$PATH"
+
 # Set working directory
 WORKDIR /app
 
-# Copy requirements
+# Copy requirements first
 COPY requirements.txt .
 
 # Install Python dependencies
 RUN pip install --no-cache-dir -r requirements.txt
 
-# Copy app code
+# Copy rest of the app
 COPY . .
 
-# Expose port for Render (Render expects web services to listen on 0.0.0.0:$PORT)
+# Expose app port
 EXPOSE 10000
 
-# Set environment variable for Flask
-ENV FLASK_ENV=production
-
-# Use Gunicorn for production server and bind to the expected port
-CMD ["gunicorn", "-b", "0.0.0.0:10000", "main:app"]
+# Run Flask app with gunicorn in production
+CMD ["gunicorn", "--bind", "0.0.0.0:10000", "main:app"]
