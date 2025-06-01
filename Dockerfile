@@ -24,8 +24,11 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy app code
 COPY . .
 
-# Expose port
+# Expose port for Render (Render expects web services to listen on 0.0.0.0:$PORT)
 EXPOSE 10000
 
-# Run app
-CMD ["python", "main.py"]
+# Set environment variable for Flask
+ENV FLASK_ENV=production
+
+# Use Gunicorn for production server and bind to the expected port
+CMD ["gunicorn", "-b", "0.0.0.0:10000", "main:app"]
