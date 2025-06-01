@@ -3,6 +3,8 @@ import pdfplumber
 from pdf2image import convert_from_bytes
 import pytesseract
 import re
+from app.parsers.fallback_text_parser import parse_unstructured_text_block
+import logging
 
 
 def detect_header_row(df_raw):
@@ -14,35 +16,6 @@ def detect_header_row(df_raw):
                                                   or "credit" in row_lower):
             return i
     return 0  # fallback if no match
-
-
-def extract_transactions_from_lines(lines):
-    transactions = []
-
-    # Match: Date, Description, Amount, [Optional Category]
-    pattern_with_cat = r"(\d{2}/\d{2}/\d{2,4})\s+(.+?)\s+\$([0-9,]+\.\d{2})\s+([A-Za-z &]+)$"
-    pattern_without_cat = r"(\d{2}/\d{2}/\d{2,4})\s+(.+?)\s+\$([0-9,]+\.\d{2})"
-
-    for line in lines:
-        match_with_cat = re.search(pattern_with_cat, line)
-        match_no_cat = re.search(pattern_without_cat, line)
-
-        if match_with_cat:
-            date, desc, amt, category = match_with_cat.groups()
-        elif match_no_cat:
-            date, desc, amt = match_no_cat.groups()
-            category = None
-        else:
-            continue
-
-        transactions.append({
-            "Date": date,
-            "Description": desc.strip(),
-            "Amount": float(amt.replace(",", "")),
-            "Category": category.strip() if category else None
-        })
-
-    return pd.DataFrame(transactions)
 
 
 def parse_file(file):
@@ -75,7 +48,7 @@ def parse_file(file):
                             if len(line.strip()) > 5
                         ])
         except Exception as e:
-            print(f"[pdfplumber] Failed: {e}")
+            logging.warning(f"[pdfplumber] Failed: {e}")
             descriptions = []
 
         # OCR fallback
@@ -97,12 +70,12 @@ def parse_file(file):
                 "Could not extract any transaction descriptions from the PDF.")
 
         # Parse structured transactions
-        df = extract_transactions_from_lines(descriptions)
+        raw_text = "\n".join(descriptions)
+        df = parse_unstructured_text_block(raw_text)
 
         if df.empty:
             raise Exception(
                 "No valid transactions found in PDF after parsing.")
-
         return df
 
     else:
