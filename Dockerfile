@@ -4,6 +4,7 @@ FROM python:3.11-slim
 # Install system dependencies including tesseract
 RUN apt-get update && apt-get install -y \
     tesseract-ocr \
+    tesseract-ocr-eng \
     poppler-utils \
     libglib2.0-0 \
     libsm6 \
@@ -16,7 +17,6 @@ RUN apt-get update && apt-get install -y \
 RUN which tesseract
 
 # Set environment variables
-ENV TESSDATA_PREFIX=/usr/share/tesseract-ocr/4.00/
 ENV PATH="/usr/bin:$PATH"
 
 # Set working directory
