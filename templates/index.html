@@ -479,11 +479,10 @@
       });
 
       fileInput?.addEventListener('change', () => {
-        const errorMsg = document.getElementById("errorMessage");
-        if (errorMsg) errorMsg.style.display = "none";  // Hide without removing
+        const serverErrorMsg = document.getElementById("serverErrorMessage");
+        if (serverErrorMsg) serverErrorMsg.style.display = "none"; // ✅ Hide on new file select
 
         if (fileInput.files.length === 0 && previousFileCount > 0) {
-          // Cancelled file picker after selecting a file
           dropzoneText?.classList.remove('hidden');
           fileNameDisplay.textContent = "";
           fileNameDisplay.classList.add('hidden');
@@ -497,8 +496,6 @@
           previousFileCount = fileInput.files.length;
         }
       });
-
-
 
       dropzone?.addEventListener('dragover', (e) => {
         e.preventDefault();
@@ -520,6 +517,10 @@
           } catch (err) {
             console.warn("File assignment failed:", err);
           }
+
+          const serverErrorMsg = document.getElementById("serverErrorMessage");
+          if (serverErrorMsg) serverErrorMsg.style.display = "none"; // ✅ Hide on drag-drop
+
           dropzoneText?.classList.add('hidden');
           fileNameDisplay.textContent = `📄 Selected: ${droppedFiles[0].name}`;
           fileNameDisplay.classList.remove('hidden');
@@ -553,6 +554,7 @@
       });
     });
   </script>
+
 
   {{ sample_route_fix | safe if sample_route_fix else '' }}
 

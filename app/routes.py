@@ -188,11 +188,12 @@ def index():
             preview_data = session.get("categorized_data")
             if preview_data:
                 parsed_preview = preview_data[:8]  # only show top 8 rows
-
+    error_message = session.pop("form_error", None)
     response = render_template("index.html",
                                result_file=result_file,
                                category_totals=category_totals,
-                               parsed_preview=parsed_preview)
+                               parsed_preview=parsed_preview,
+                               error=error_message)
 
     # Clean up session keys (safe to call after render)
     session.pop("categorized_data", None)
